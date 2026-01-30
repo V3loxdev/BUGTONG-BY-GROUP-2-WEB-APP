@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bugtong Bugtong: G2</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+:root {
+  --primary: #ffeb3b;
+  --secondary: #ff4081;
+  --bg: #1a1a2e;
+  --neon-green: #00ff41;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: 'Press Start 2P', cursive;
+  background: var(--bg);
+  background: radial-gradient(circle, #2e1a47 0%, #0f0f1b 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  color: #fff;
+  overflow: hidden;
+}
+
+/* Background Animations */
+#emoji-container { position: fixed; width: 100%; height: 100%; top: 0; z-index: 0; }
+.emoji-particle {
+  position: absolute;
+  font-size: 1.5rem;
+  opacity: 0.4;
+  animation: floatUp 10s linear infinite;
+}
+
+@keyframes floatUp {
+  0% { transform: translateY(110vh) rotate(0deg); }
+  100% { transform: translateY(-20vh) rotate(360deg); }
+}
+
+/* Main Card */
+.card {
+  background: rgba(255, 235, 59, 0.95);
+  border: 6px solid #333;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 12px 12px 0px var(--secondary), 20px 20px 0px #333;
+  text-align: center;
+  max-width: 700px;
+  width: 90%;
+  position: relative;
+  z-index: 10;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.card-enter { animation: cardSlideIn 0.6s ease-out; }
+@keyframes cardSlideIn {
+  from { opacity: 0; transform: translateY(50px) scale(0.9); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.main-title {
+  font-size: 1.2rem;
+  color: #fff;
+  -webkit-text-stroke: 1.5px #333;
+  text-shadow: 4px 4px 0px #333;
+  margin-bottom: 20px;
+}
+
+/* Display & Progress */
+#progress-container {
+  width: 100%;
+  height: 20px;
+  background: #333;
+  border: 3px solid #000;
+  margin-bottom: 15px;
+  position: relative;
+}
+
+#progress-bar {
+  width: 0%;
+  height: 100%;
+  background: var(--neon-green);
+  transition: width 0.3s ease;
+}
+
+#display-area {
+  background: #000;
+  min-height: 220px;
+  border: 4px solid #fff;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-shadow: inset 0 0 15px var(--neon-green);
+}
+
+#riddle { 
+  font-size: 0.8rem; 
+  line-height: 1.6; 
+  color: var(--neon-green);
+  margin-bottom: 20px;
+}
+
+/* Buttons */
+.btn {
+  padding: 14px;
+  border: 4px solid #333;
+  cursor: pointer;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.65rem;
+  margin: 8px 0;
+  background: #fff;
+  color: #333;
+  box-shadow: 4px 4px 0 #333;
+  width: 100%;
+  display: block;
+  transition: 0.2s;
+}
+
+.btn:hover {
+  background: var(--secondary);
+  color: #fff;
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 #333;
+}
+
+.btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0px 0px 0 #333;
+}
+
+/* Popups */
+.popup {
+  position: fixed;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(8px);
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.popup-content {
+  padding: 40px;
+  border: 8px solid #fff;
+  text-align: center;
+  max-width: 80%;
+  animation: scaleUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes scaleUp { from { transform: scale(0.5); } to { transform: scale(1); } }
+
+.confirm-bg { background: rgba(0, 0, 0, 0.9); }
+.correct-bg { background: rgba(46, 204, 113, 0.95); }
+.wrong-bg { background: rgba(231, 76, 60, 0.95); }
+
+.shake { animation: shake 0.2s ease infinite; }
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.countdown { font-size: 4rem; margin-top: 20px; color: #fff; text-shadow: 4px 4px 0 #000; }
+</style>
+</head>
+<body>
+
+<div id="emoji-container"></div>
+
+<div class="card card-enter" id="instruction-screen">
+  <h1 class="main-title">G2 BUGTONG 50 ULTRA TANONG</h1>
+  <div style="background: #333; color: #fff; padding: 15px; margin-bottom: 20px; border: 3px dashed #ffeb3b; font-size: 0.55rem; line-height: 2;">
+    <span style="color: #ffeb3b;">RULES AND GAME ROLE:</span><br>
+    - 50 TANONG NA PURO KALOKOHAN<br>
+    - 3 SECONDS CONFIRMATION TIMER<br>
+    - BAWAL MAG-TANONG (MABABAWASAN TALINO MO)
+  </div>
+  <button id="start-btn" class="btn">G! SIMULAN NA 🚀</button>
+</div>
+
+<div class="card" id="game-screen" style="display:none;">
+  <div id="progress-container"><div id="progress-bar"></div></div>
+  <div style="font-size: 0.5rem; color: #333; margin-bottom: 5px;" id="quest-label">Quest: 1/50</div>
+  <div id="display-area">
+    <p id="riddle"></p>
+    <div id="choices"></div>
+  </div>
+</div>
+
+<div id="popup-box" class="popup">
+  <div class="popup-content" id="popup-inner">
+    <div id="popup-message" style="font-size: 1rem; line-height: 1.5;"></div>
+    <div id="countdown" class="countdown"></div>
+  </div>
+</div>
+
+<script>
+const riddles = [
+  { q: "May paa walang kamay, may balahibo walang buhok.", c: ["Manok", "Unan", "Daga"], a: "Manok" },
+  { q: "Hindi tao, hindi hayop, pero may mata.", c: ["Karayom", "Pinya", "Bagyo"], a: "Karayom" },
+  { q: "Lumakad walang paa, lumipad walang pakpak.", c: ["Hangin", "Ulap", "Pangarap"], a: "Hangin" },
+  { q: "May dila pero hindi makapagsalita, may sapatos pero walang paa.", c: ["Sapatos", "Lata", "Kandila"], a: "Sapatos" },
+  { q: "Anong meron sa gitna ng DAGAT?", c: ["Titik G", "Asin", "Isda"], a: "Titik G" },
+  { q: "Isang butil ng palay, sakop ang buong bahay.", c: ["Ilaw", "Kulambo", "Amoy ng utot"], a: "Ilaw" },
+  { q: "Nagtago si Pedro, nakalitaw ang ulo.", c: ["Pako", "Kuko", "Pagong"], a: "Pako" },
+  { q: "Baboy ko sa pulo, ang balahibo ay pako.", c: ["Langka", "Durian", "Sitao"], a: "Langka" },
+  { q: "Kung kailan mo pinatay, saka pa humaba ang buhay.", c: ["Kandila", "Sigarilyo", "Bumbilya"], a: "Kandila" },
+  { q: "Ate mo, ate ko, ate nating lahat.", c: ["Atis", "Nanay", "Tindera"], a: "Atis" },
+  { q: "Hinila ko ang baging, nagkakara ang matsing.", c: ["Kampana", "Kurtina", "Yoyo"], a: "Kampana" },
+  { q: "Maliit pa si nene, marunong nang manahi.", c: ["Gagamba", "Langgam", "Modista"], a: "Gagamba" },
+  { q: "Dalawang balon, hindi malingon.", c: ["Tenga", "Mata", "Butas ng ilong"], a: "Tenga" },
+  { q: "Bumubuka'y walang bibig, ngumingiti nang tahimik.", c: ["Bulaklak", "Bintana", "Libro"], a: "Bulaklak" },
+  { q: "Dala mo, dala ka, pero laging nasa likod mo.", c: ["Anino", "Bag", "Kasalanan"], a: "Anino" },
+  { q: "Isang hukbo ng sundalo, laging nakatayo sa ulo.", c: ["Buhok", "Kuto", "Sugal"], a: "Buhok" },
+  { q: "Matanda na ang nuno, hindi pa naliligo.", c: ["Pusa", "Daga", "Ipis"], a: "Pusa" },
+  { q: "Binili ko nang patay, nung binitay, nabuhay.", c: ["Payong", "Kandila", "Halaman"], a: "Payong" },
+  { q: "Anong hayop ang palaging may dalang bahay?", c: ["Pagong", "Langgam", "Ahas"], a: "Pagong" },
+  { q: "Mataas kung nakaupo, mababa kung nakatayo.", c: ["Aso", "Silya", "Tao"], a: "Aso" },
+  { q: "Buto't balat, lumilipad.", c: ["Saranggola", "Ibon", "Langgaw"], a: "Saranggola" },
+  { q: "Isang panyong parisukat, kung buksan ay dagat.", c: ["Mapa", "Tuwalya", "Sulat"], a: "Mapa" },
+  { q: "Kadenang naggagandahan, sa leeg nakasabit.", c: ["Kwintas", "Posas", "Tali"], a: "Kwintas" },
+  { q: "Bahay ni Ka Huli, haligi'y bali-bali.", c: ["Alimango", "Bahay Kubo", "Sapot"], a: "Alimango" },
+  { q: "Limang magkakapatid, laging kabit-kabit.", c: ["Daliri", "Lapis", "Sinturon"], a: "Daliri" },
+  { q: "Kay rami-raming bituin, hindi mo naman mabilang.", c: ["Buhok", "Buhangin", "Langit"], a: "Buhok" },
+  { q: "Hindi hayop, hindi tao, may dalawang pakpak.", c: ["Eroplano", "Ibon", "Anghel"], a: "Eroplano" },
+  { q: "Dumaan ang hari, nagkakara ang pari.", c: ["Walis", "Lechon", "Bote"], a: "Walis" },
+  { q: "Anong pagkain ang hindi kinakain ang labas, at hindi rin kinakain ang loob?", c: ["Mais", "Itlog", "Saging"], a: "Mais" },
+  { q: "Langit sa itaas, langit sa ibaba, may tubig sa gitna.", c: ["Niyog", "Ulan", "Baso"], a: "Niyog" },
+  { q: "Dalawang magkaibigan, laging nag-uunahan.", c: ["Paa", "Mata", "Tsinelas"], a: "Paa" },
+  { q: "Kung tawagin nila ay 'Susi', pero hindi nakakabukas ng pinto.", c: ["Susi ng gitara", "Susi ng kotse", "Susô"], a: "Susi ng gitara" },
+  { q: "Bastong hindi mahawakan, bituing hindi mabilang.", c: ["Ulan", "Kidlat", "Kuryente"], a: "Ulan" },
+  { q: "Isang bayabas, pito ang butas.", c: ["Ulo", "Pito", "Plawta"], a: "Ulo" },
+  { q: "Heto na si Kaka, bubuka-bukaka.", c: ["Gunting", "Palaka", "Payong"], a: "Gunting" },
+  { q: "Yakap mo na, pinapalo mo pa.", c: ["Tambol", "Unan", "Anak"], a: "Tambol" },
+  { q: "Puno ay buku-buko, dahon ay abaniko.", c: ["Saging", "Niyog", "Papaya"], a: "Saging" },
+  { q: "Tumingin ka sa akin, makikita mo ang sarili mo.", c: ["Salamin", "Mata", "Tubig"], a: "Salamin" },
+  { q: "Ulan nang ulan, hindi pa rin nababasa ang lolo.", c: ["Nasa loob", "Naka-kapote", "Kalbo"], a: "Nasa loob" },
+  { q: "Anong tinapay ang hindi kinakain ang gitna?", c: ["Donut", "Monay", "Pandesal"], a: "Donut" },
+  { q: "Lumuluha walang mata, lumalakad walang paa.", c: ["Kandila", "Pluma", "Ulap"], a: "Kandila" },
+  { q: "Palda ni Santa Maria, ang kulay ay iba-iba.", c: ["Bahaghari", "Gumamela", "Lollipop"], a: "Bahaghari" },
+  { q: "Buhok ng pari, hindi mahawi-hawi.", c: ["Tubig", "Damo", "Ulan"], a: "Tubig" },
+  { q: "Nanganak ang birhen, itinapon ang lampin.", c: ["Saging", "Itlog", "Mais"], a: "Saging" },
+  { q: "Maliit na bahay, puno ng mga patay.", c: ["Posporo", "Kabaong", "Sementeryo"], a: "Posporo" },
+  { q: "Isang malaking kura, laging nakadungaw sa bintana.", c: ["Sipon", "Mata", "Tao"], a: "Sipon" },
+  { q: "Baka ko sa Maynila, abot hanggang dito ang unga.", c: ["Kulog", "Telepono", "Radyo"], a: "Kulog" },
+  { q: "Dito ay pito, doon ay pito, sa gitna ay walis.", c: ["Kamay", "Paa", "Katawan"], a: "Kamay" },
+  { q: "Anong meron sa Jeep, Bus, at Tren na wala sa Eroplano?", c: ["Barker", "Gulong", "Pasahero"], a: "Barker" },
+  { q: "May lalamunan pero walang leeg.", c: ["Bote", "Baso", "Sapatos"], a: "Bote" }
+];
+
+let current = 0;
+let score = 0;
+const gameCard = document.getElementById('game-screen');
+const riddleEl = document.getElementById('riddle');
+const choicesEl = document.getElementById('choices');
+const popupBox = document.getElementById('popup-box');
+const popupInner = document.getElementById('popup-inner');
+const popupMsg = document.getElementById('popup-message');
+const countdownEl = document.getElementById('countdown');
+const progressBar = document.getElementById('progress-bar');
+const questLabel = document.getElementById('quest-label');
+
+function createEmojis() {
+  const container = document.getElementById('emoji-container');
+  const emojis = ['BUGTONG', 'BUGTONG', 'BUGTONG', 'BUGTONG', 'BUGTONG', 'BUGTONG', 'BUGTONG'];
+  for (let i = 0; i < 30; i++) {
+    const span = document.createElement('span');
+    span.className = 'emoji-particle';
+    span.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+    span.style.left = Math.random() * 100 + 'vw';
+    span.style.animationDelay = Math.random() * 10 + 's';
+    span.style.fontSize = (Math.random() * 1 + 1) + 'rem';
+    container.appendChild(span);
+  }
+}
+
+function loadRiddle() {
+  const r = riddles[current];
+  questLabel.innerText = `Quest: ${current + 1}/${riddles.length}`;
+  progressBar.style.width = `${((current + 1) / riddles.length) * 100}%`;
+  riddleEl.innerText = r.q;
+  choicesEl.innerHTML = "";
+  
+  const shuffled = [...r.c].sort(() => Math.random() - 0.5);
+  shuffled.forEach(choice => {
+    const btn = document.createElement('button');
+    btn.className = "btn";
+    btn.innerText = choice;
+    btn.onclick = () => confirmChoice(choice, r.a);
+    choicesEl.appendChild(btn);
+  });
+  
+  gameCard.classList.add('card-enter');
+  setTimeout(() => gameCard.classList.remove('card-enter'), 600);
+}
+
+function confirmChoice(choice, answer) {
+  popupMsg.innerText = `SURE KA NA BA DIYAN?\n"${choice}"`;
+  popupInner.className = "popup-content confirm-bg shake";
+  popupBox.style.display = "flex";
+
+  let sec = 3;
+  countdownEl.innerText = sec;
+  const timer = setInterval(() => {
+    sec--;
+    if (sec > 0) countdownEl.innerText = sec;
+    else {
+      clearInterval(timer);
+      showResult(choice, answer);
+    }
+  }, 800);
+}
+
+function showResult(choice, answer) {
+  const isCorrect = choice === answer;
+  if (isCorrect) {
+    score++;
+    popupMsg.innerText = "🌟 WOW! GENIUS! 🌟";
+    popupInner.className = "popup-content correct-bg";
+  } else {
+    popupMsg.innerText = `🤡 GG! MALI KA! \nTAMA: ${answer}`;
+    popupInner.className = "popup-content wrong-bg";
+  }
+  countdownEl.innerText = "";
+
+  setTimeout(() => {
+    popupBox.style.display = "none";
+    current++;
+    if (current < riddles.length) loadRiddle();
+    else finish();
+  }, 1800);
+}
+
+function finish() {
+  const rank = score === 50 ? "HOKAGE" : score > 40 ? "LODI" : "NUB";
+  popupMsg.innerText = `🏆 TAPOS ANG LABAN! 🏆\nSCORE: ${score}/50\nRANK: ${rank}`;
+  popupInner.className = "popup-content confirm-bg";
+  popupBox.style.display = "flex";
+  countdownEl.innerText = "GG!";
+  setTimeout(() => location.reload(), 6000);
+}
+
+document.getElementById('start-btn').onclick = () => {
+  document.getElementById('instruction-screen').style.display = "none";
+  gameCard.style.display = "block";
+  loadRiddle();
+};
+
+createEmojis();
+</script>
+</body>
+</html>
